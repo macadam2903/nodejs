@@ -1,0 +1,23 @@
+{
+  "name": "gyumolcsos",
+  "version": "1.0.0",
+  "description": "gyumolcsos express app",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "express",
+    "mysql",
+    "rest-api",
+    "crud"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mysql2": "^3.15.3"
+  }
+}
