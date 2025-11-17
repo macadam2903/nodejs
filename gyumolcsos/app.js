@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: '', // Módosítsd a saját jelszavadra
+  password: '', 
   database: 'fruits',
   port: 3307
 };
