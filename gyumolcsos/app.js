@@ -29,7 +29,8 @@ const dbConfig = {
   host: 'localhost',
   user: 'root',
   password: '', // Módosítsd a saját jelszavadra
-  database: 'fruits'
+  database: 'fruits',
+  port: 3307
 };
 
 // Adatbázis kapcsolat létrehozása
