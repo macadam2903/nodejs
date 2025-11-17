@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyümölcs Kezelő</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .fruits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .fruit-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .fruit-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .fruit-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .fruit-detail {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .fruit-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .fruit-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .fruit-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍎 Gyümölcs Kezelő</h1>
+
+        <div class="card">
+            <h2>➕ Új gyümölcs hozzáadása</h2>
+            <div id="message"></div>
+            <form id="addFruitForm">
+                <div class="form-group">
+                    <label for="name">Gyümölcs neve:</label>
+                    <input type="text" id="name" name="name" required placeholder="pl. Eper">
+                </div>
+                <div class="form-group">
+                    <label for="color">Szín:</label>
+                    <input type="text" id="color" name="color" required placeholder="pl. Piros">
+                </div>
+                <div class="form-group">
+                    <label for="price">Ár (Ft):</label>
+                    <input type="number" id="price" name="price" step="0.01" required placeholder="pl. 800.00">
+                </div>
+                <button type="submit">Hozzáadás</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>📋 Gyümölcsök listája</h2>
+            <button onclick="loadFruits()" style="margin-bottom: 20px;">🔄 Frissítés</button>
+            <div id="fruitsList" class="fruits-list">
+                <div class="loading">Betöltés...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        // Üzenet megjelenítése
+        function showMessage(text, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        // Gyümölcsök betöltése
+        async function loadFruits() {
+            const fruitsList = document.getElementById('fruitsList');
+            fruitsList.innerHTML = '<div class="loading">Betöltés...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/fruits`);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    fruitsList.innerHTML = data.data.map(fruit => `
+                        <div class="fruit-item">
+                            <div class="fruit-name">${fruit.name}</div>
+                            <div class="fruit-detail">🎨 Szín: ${fruit.color}</div>
+                            <div class="fruit-price">💰 ${fruit.price} Ft</div>
+                            <div class="fruit-actions">
+                                <button class="btn-update" onclick="updatePrice(${fruit.id}, '${fruit.name}')">
+                                    Ár módosítása
+                                </button>
+                                <button class="btn-delete" onclick="deleteFruit(${fruit.id}, '${fruit.name}')">
+                                    Törlés
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    fruitsList.innerHTML = '<div class="loading">Nincs gyümölcs az adatbázisban</div>';
+                }
+            } catch (error) {
+                fruitsList.innerHTML = '<div class="loading">Hiba történt a betöltés során</div>';
+                console.error('Hiba:', error);
+            }
+        }
+
+        // Új gyümölcs hozzáadása
+        document.getElementById('addFruitForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                color: document.getElementById('color').value,
+                price: parseFloat(document.getElementById('price').value)
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/fruits`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`✅ ${formData.name} sikeresen hozzáadva!`, 'success');
+                    document.getElementById('addFruitForm').reset();
+                    loadFruits();
+                } else {
+                    showMessage(`❌ Hiba: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Hiba történt a mentés során', 'error');
+                console.error('Hiba:', error);
+            }
+        });
+
+        // Ár módosítása
+        async function updatePrice(id, name) {
+            const newPrice = prompt(`Adj meg új árat a(z) ${name} gyümölcshöz (Ft):`, '');
+            
+            if (newPrice === null || newPrice.trim() === '') return;
+
+            const price = parseFloat(newPrice);
+            if (isNaN(price) || price < 0) {
+                alert('Érvénytelen ár!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/fruits/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ price })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`✅ ${name} ára módosítva: ${price} Ft`, 'success');
+                    loadFruits();
+                } else {
+                    alert(`Hiba: ${data.message}`);
+                }
+            } catch (error) {
+                alert('Hiba történt a módosítás során');
+                console.error('Hiba:', error);
+            }
+        }
+
+        // Gyümölcs törlése
+        async function deleteFruit(id, name) {
+            if (!confirm(`Biztosan törölni szeretnéd: ${name}?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/fruits/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`✅ ${name} törölve`, 'success');
+                    loadFruits();
+                } else {
+                    alert(`Hiba: ${data.message}`);
+                }
+            } catch (error) {
+                alert('Hiba történt a törlés során');
+                console.error('Hiba:', error);
+            }
+        }
+
+        // Oldal betöltésekor
+        loadFruits();
+    </script>
+</body>
+</html>
