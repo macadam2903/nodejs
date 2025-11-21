@@ -1,8 +1,14 @@
 import express from 'express';
 const customersRouter = express.Router();
-customersRouter.get('/', (req, res) => {
-    // a teljes útvonal: http://localhost:3000/customers/
-    res.send('Összes ügyfél lekérése');
+ 
+customersRouter.get('/', async (req, res) => {
+    try {
+        const customers = await customerModel.getAllCustomers();
+        res.status(200).send(customers);
+    } catch (error) {
+        console.error('Hiba az ügyfelek lekérésekor:', error);
+        res.status(500).send({ error: 'Hiba történt az ügyfelek lekérése során.' });
+    }
 });
 customersRouter.get('/:id', (req, res) => {
     const customerId = req.params.id;
