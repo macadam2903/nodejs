@@ -12,11 +12,11 @@ import tetelRouter from './routes/tetelRouter.js';
 import vevoRouter from './routes/vevoRouter.js';
 
 
-app.use('/futar', futarRouter); 
-app.use('/pizza', pizzaRouter);
-app.use('/rendeles', rendelesRouter);
-app.use('/tetel', tetelRouter);
-app.use('/vevo', vevoRouter);
+app.use('/api/futar', futarRouter); 
+app.use('/api/pizza', pizzaRouter);
+app.use('/api/rendeles', rendelesRouter);
+app.use('/api/tetel', tetelRouter);
+app.use('/api/vevo', vevoRouter);
 
 app.listen(3000, () => {
     console.log('Szerver elindult a http://localhost:3000 címen');
