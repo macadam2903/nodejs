@@ -3,6 +3,17 @@ import * as tetelModel from "../models/tetelModel.js";
 
 const router = express.Router();
 
+// GET /tetel
+router.get("/", async (req, res) => {
+    try {
+        const tetelek = await tetelModel.getAllTetelek();
+        res.status(200).json(tetelek);
+    } catch (error) {
+        console.error("Hiba a tételek lekérésekor:", error);
+        res.status(500).json({ error: "Hiba történt a tételek lekérése során." });
+    }
+});
+
 // GET /tetel/:razon
 router.get("/:razon", async (req, res) => {
     try {
